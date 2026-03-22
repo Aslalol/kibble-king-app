@@ -1,10 +1,12 @@
 import { Pet } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Trash2 } from 'lucide-react';
 
 interface PetCardProps {
   pet: Pet;
   selected?: boolean;
   onClick?: () => void;
+  onDelete?: (id: string) => void;
 }
 
 const goalLabels: Record<string, string> = {
@@ -19,12 +21,12 @@ const activityLabels: Record<string, string> = {
   high: 'Alta',
 };
 
-export function PetCard({ pet, selected, onClick }: PetCardProps) {
+export function PetCard({ pet, selected, onClick, onDelete }: PetCardProps) {
   return (
-    <button
+    <div
       onClick={onClick}
       className={cn(
-        'w-full text-left rounded-xl p-4 transition-all duration-200 border-2',
+        'w-full text-left rounded-xl p-4 transition-all duration-200 border-2 cursor-pointer',
         'hover:shadow-md active:scale-[0.98]',
         selected
           ? 'border-primary bg-primary/5 shadow-md'
@@ -34,7 +36,18 @@ export function PetCard({ pet, selected, onClick }: PetCardProps) {
       <div className="flex items-start gap-3">
         <span className="text-3xl leading-none mt-0.5">{pet.avatarEmoji}</span>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-base text-foreground">{pet.name}</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-base text-foreground">{pet.name}</h3>
+            {onDelete && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(pet.id); }}
+                className="rounded-lg p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors active:scale-95"
+                title="Remover pet"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
             {pet.breed} · {pet.age} {pet.age === 1 ? 'ano' : 'anos'}
           </p>
@@ -48,9 +61,12 @@ export function PetCard({ pet, selected, onClick }: PetCardProps) {
             <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               {goalLabels[pet.feedingGoal]}
             </span>
+            <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary tabular-nums">
+              Meta: {pet.dailyRecommendedGrams}g/dia
+            </span>
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
